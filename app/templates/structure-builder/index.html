@@ -1,0 +1,1129 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Create Blueprint - Content Creator{% endblock %}
+
+{% block styles %}
+<style>
+    /* ===== PAGE CONTAINER ===== */
+    .page-wrapper {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    
+    .page-header {
+        margin-top: 80px;
+    }
+
+    /* ===== HERO HEADER ===== */
+    .hero-header {
+        background: var(--gradient-primary);
+        border-radius: var(--radius-lg);
+        padding: 2rem 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(24, 95, 165, 0.3);
+        margin-bottom: 1.5rem;
+    }
+    
+    [data-bs-theme="dark"] .hero-header {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .hero-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .hero-header .hero-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .hero-header h1 {
+        color: white;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    .hero-header p {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+    }
+    
+    .hero-header .badge {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.35rem 1rem;
+    }
+
+    /* ===== STEPS WRAPPER ===== */
+    .steps-wrapper {
+        margin-bottom: 1.5rem;
+        background: var(--bg-card);
+        border-radius: 100px;
+        padding: 0.5rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+    
+    [data-bs-theme="dark"] .steps-wrapper {
+        background: var(--bg-card);
+    }
+
+    .step-bar {
+        display: flex;
+        background: transparent;
+        border-radius: 100px;
+        gap: 0.25rem;
+    }
+
+    .step {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.7rem 0.5rem;
+        border-radius: 60px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .step:hover:not(.active):not(.done) {
+        background: var(--bg-input);
+        color: var(--text-primary);
+    }
+
+    .step.active {
+        background: var(--primary-light);
+        color: var(--primary);
+        font-weight: 600;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .step.done {
+        color: var(--success);
+    }
+
+    .step-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--bg-input);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        color: var(--text-secondary);
+        border: 2px solid var(--border-color-solid);
+    }
+
+    .step.active .step-num {
+        background: var(--gradient-primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(24, 95, 165, 0.3);
+    }
+
+    .step.done .step-num {
+        background: var(--gradient-success);
+        color: white;
+        border-color: var(--success);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    /* ===== PANEL CARDS ===== */
+    .panel-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        margin-bottom: 1.5rem;
+    }
+
+    .panel-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .panel-card .card-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--bg-header);
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    }
+
+    .panel-card .card-header i {
+        color: var(--primary);
+        width: 1.25rem;
+        text-align: center;
+    }
+
+    .panel-card .card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .panel-card .card-footer {
+        padding: 1rem 1.5rem;
+        background: var(--bg-footer);
+        border-top: 1px solid var(--border-color);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+    }
+
+    /* ===== FIELDS ===== */
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .field label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .field label i {
+        color: var(--primary);
+        font-size: 0.8rem;
+        width: 1rem;
+    }
+
+    /* ===== FORM ELEMENTS ===== */
+    .form-control-custom {
+        background: var(--bg-input);
+        border: 2px solid var(--border-color-solid);
+        border-radius: var(--radius-sm);
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-family: inherit;
+        width: 100%;
+        transition: all 0.3s ease;
+        color: var(--text-primary);
+    }
+
+    .form-control-custom:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(24, 95, 165, 0.1);
+        outline: none;
+        background: var(--bg-input-focus);
+    }
+
+    .form-control-custom::placeholder {
+        color: var(--text-light);
+    }
+
+    .form-control-custom option {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    textarea.form-control-custom {
+        resize: vertical;
+        line-height: 1.6;
+        min-height: 80px;
+    }
+
+    select.form-control-custom {
+        appearance: auto;
+        cursor: pointer;
+    }
+
+    /* ===== GRID ===== */
+    .row-2cols, .row-3cols {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    .row-3cols {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* ===== BUTTON ROW ===== */
+    .btn-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-row .btn {
+        min-width: 120px;
+    }
+
+    /* ===== BLUEPRINT AREA ===== */
+    .blueprint-area {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding: 1.5rem;
+        background: var(--bg-secondary);
+        transition: background 0.3s ease;
+    }
+
+    .blueprint-area::-webkit-scrollbar {
+        width: 6px;
+    }
+    .blueprint-area::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+    .blueprint-area::-webkit-scrollbar-thumb {
+        background: var(--text-light);
+        border-radius: 3px;
+    }
+    .blueprint-area::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+
+    .blueprint-meta {
+        background: var(--bg-card);
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .blueprint-meta h3 {
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        font-weight: 700;
+    }
+
+    .blueprint-meta p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+    }
+
+    /* ===== BLUEPRINT TABLE ===== */
+    .blueprint-table {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+    }
+
+    .blueprint-table-header {
+        display: flex;
+        font-weight: 700;
+        background: var(--bg-header);
+        padding: 0.75rem 1rem;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .blueprint-table-header .col-section {
+        flex: 2;
+    }
+
+    .blueprint-table-header .col-words {
+        flex: 1;
+        text-align: right;
+    }
+
+    .blueprint-table-row {
+        display: flex;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        color: var(--text-secondary);
+    }
+
+    .blueprint-table-row:last-child {
+        border-bottom: none;
+    }
+
+    .blueprint-table-row:hover {
+        background: var(--bg-input);
+    }
+
+    .blueprint-table-row .col-section {
+        flex: 2;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .blueprint-table-row .col-words {
+        flex: 1;
+        text-align: right;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .blueprint-table-total {
+        display: flex;
+        padding: 0.75rem 1rem;
+        font-weight: 700;
+        background: var(--bg-header);
+        border-top: 2px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .blueprint-table-total .col-section {
+        flex: 2;
+    }
+
+    .blueprint-table-total .col-words {
+        flex: 1;
+        text-align: right;
+        color: var(--primary);
+    }
+
+    /* ===== LOADING STATE ===== */
+    .loading-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .loading-state .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid var(--border-color);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    .loading-state strong {
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+
+    .loading-state p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state i {
+        font-size: 3.5rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+        display: block;
+        color: var(--text-muted);
+    }
+
+    .empty-state strong {
+        color: var(--text-primary);
+    }
+
+    /* ===== HINT ===== */
+    .hint {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+
+    /* ===== INFO ALERT ===== */
+    .alert-info-custom {
+        background: var(--bg-alert-info);
+        border-left: 4px solid var(--primary);
+        border-radius: var(--radius-sm);
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-info-custom i {
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .page-wrapper {
+            padding: 0.75rem;
+        }
+        
+        .hero-header {
+            padding: 1.5rem;
+        }
+        
+        .hero-header .hero-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
+        
+        .hero-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .row-2cols, .row-3cols {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .step span:not(.step-num) {
+            display: none;
+        }
+        
+        .step {
+            padding: 0.5rem 0.25rem;
+        }
+        
+        .panel-card .card-body {
+            padding: 1.25rem;
+        }
+        
+        .btn-row {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .btn-row .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .steps-wrapper {
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .step {
+            font-size: 0.75rem;
+        }
+        .step-num {
+            width: 24px;
+            height: 24px;
+            font-size: 0.65rem;
+        }
+        .btn-row .btn {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+        .steps-wrapper,
+        .btn-row,
+        .btn,
+        .no-print,
+        .hero-header .badge {
+            display: none !important;
+        }
+        
+        .panel-card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+            background: white !important;
+        }
+        
+        .blueprint-area {
+            max-height: none;
+            overflow: visible;
+            background: white !important;
+        }
+        
+        .hero-header {
+            background: #185FA5 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        
+        .hero-header h1,
+        .hero-header p {
+            color: white !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="hero-header animate-fade-in">
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                <div class="hero-icon">
+                    <i class="fas fa-drafting-compass"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h1 class="mb-1">Content Creator</h1>
+                    <p class="mb-2">Generate structured academic blueprints with AI assistance</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge"><i class="fas fa-magic me-1"></i> AI Powered</span>
+                        <span class="badge"><i class="fas fa-structure me-1"></i> Structured</span>
+                        <span class="badge"><i class="fas fa-rocket me-1"></i> Fast Generation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO ALERT -->
+    <div class="alert-info-custom animate-fade-in">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>4-step process:</strong> Fill in the details, define structure, set preferences, and generate your academic blueprint.
+        </div>
+    </div>
+
+    <!-- Step Bar -->
+    <div class="steps-wrapper animate-fade-in">
+        <div class="step-bar">
+            <div class="step active" data-step="1">
+                <div class="step-num">1</div>
+                <span>Brief</span>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-num">2</div>
+                <span>Structure</span>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-num">3</div>
+                <span>Preferences</span>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-num">4</div>
+                <span>Blueprint</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 1: Basic Information -->
+    <div id="step1Panel" class="panel-card animate-fade-in">
+        <div class="card-header">
+            <i class="fas fa-pencil-alt"></i> Assignment Brief
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <label><i class="fas fa-heading"></i> Topic / Title</label>
+                <input type="text" id="title" name="assignment_title" class="form-control-custom" placeholder="e.g., The Impact of AI on Modern Healthcare" autocomplete="off">
+            </div>
+            <div class="field">
+                <label><i class="fas fa-align-left"></i> Description / Brief</label>
+                <textarea id="brief" class="form-control-custom" rows="4" placeholder="Provide detailed instructions, research questions, or core objectives..."></textarea>
+            </div>
+            <div class="row-2cols">
+                <div class="field">
+                    <label><i class="fas fa-sort-amount-down-alt"></i> Word count target</label>
+                    <select id="wordCount" class="form-control-custom">
+                        <option value="500">~500 words</option>
+                        <option value="1000">~1,000 words</option>
+                        <option value="2000" selected>~2,000 words</option>
+                        <option value="3000">~3,000 words</option>
+                        <option value="5000">~5,000 words</option>
+                        <option value="8000">~8,000 words</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label><i class="fas fa-graduation-cap"></i> Academic level</label>
+                    <select id="academicLevel" class="form-control-custom">
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="postgraduate" selected>Postgraduate / Master's</option>
+                        <option value="phd">PhD / Doctoral</option>
+                        <option value="professional">Professional / Executive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="goToStep(2)">Next: Structure <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 2: Structure & Key Points -->
+    <div id="step2Panel" class="panel-card" style="display:none;">
+        <div class="card-header">
+            <i class="fas fa-layer-group"></i> Define Structure
+        </div>
+        <div class="card-body">
+            <div class="field">
+                <label><i class="fas fa-list-ol"></i> Sections / Headings (one per line)</label>
+                <textarea id="structure" class="form-control-custom" rows="6" placeholder="Introduction&#10;Literature Review&#10;Methodology&#10;Analysis & Findings&#10;Discussion&#10;Conclusion&#10;References"></textarea>
+                <div class="hint">Each line becomes a major section in your blueprint.</div>
+            </div>
+            <div class="field">
+                <label><i class="fas fa-lightbulb"></i> Key points / arguments to include</label>
+                <textarea id="keypoints" class="form-control-custom" rows="3" placeholder="Specific theories, data sources, case studies, or mandatory arguments..."></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" onclick="goToStep(3)">Next: Writing Style <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3: Writing Preferences -->
+    <div id="step3Panel" class="panel-card" style="display:none;">
+        <div class="card-header">
+            <i class="fas fa-sliders-h"></i> Format & Tone
+        </div>
+        <div class="card-body">
+            <div class="row-3cols">
+                <div class="field">
+                    <label><i class="fas fa-file-alt"></i> Content type</label>
+                    <select id="contentType" class="form-control-custom">
+                        <option value="essay">Essay</option>
+                        <option value="report">Report</option>
+                        <option value="literature_review" selected>Literature Review</option>
+                        <option value="thesis_chapter">Thesis Chapter</option>
+                        <option value="research_paper">Research Paper</option>
+                        <option value="case_study">Case Study</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label><i class="fas fa-quote-right"></i> Citation style</label>
+                    <select id="referencingStyle" class="form-control-custom">
+                        <option value="APA 7th">APA 7th Edition</option>
+                        <option value="Harvard">Harvard</option>
+                        <option value="MLA">MLA</option>
+                        <option value="Chicago">Chicago</option>
+                        <option value="Vancouver">Vancouver</option>
+                        <option value="IEEE">IEEE</option>
+                        <option value="none">No citations</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row-3cols">
+                <div class="field">
+                    <label><i class="fas fa-feather-alt"></i> Writing style / Tone</label>
+                    <select id="writingStyle" class="form-control-custom">
+                        <option value="Analytical">Analytical</option>
+                        <option value="Critical" selected>Critical</option>
+                        <option value="Descriptive">Descriptive</option>
+                        <option value="Persuasive">Persuasive</option>
+                        <option value="Academic Formal">Academic Formal</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label><i class="fas fa-user"></i> Person</label>
+                    <select id="person" class="form-control-custom">
+                        <option value="third" selected>Third person</option>
+                        <option value="first">First person</option>
+                        <option value="mixed">Mixed (if allowed)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label><i class="fas fa-globe"></i> English variant</label>
+                    <select id="variant" class="form-control-custom">
+                        <option value="UK">UK English</option>
+                        <option value="US">US English</option>
+                    </select>
+                </div>
+            </div>
+           
+            <div class="field">
+                <label><i class="fas fa-comment-dots"></i> Additional instructions</label>
+                <textarea id="specialInstructions" class="form-control-custom" rows="2" placeholder="e.g., 'Focus on recent studies (post-2020)', 'Include counterarguments', 'Avoid first-person'..."></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="generateBtn"><i class="fas fa-magic"></i> Generate Blueprint</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 4: Blueprint Preview -->
+    <div id="step4Panel" class="panel-card" style="display:none;">
+        <div class="card-header">
+            <i class="fas fa-drafting-compass"></i> Your Academic Blueprint
+        </div>
+        <div id="previewContainer" class="blueprint-area">
+            <div class="empty-state">
+                <i class="fas fa-drafting-compass"></i>
+                <p>Fill in the details and click <strong>Generate Blueprint</strong> to see your structured outline.</p>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="btn-row" style="justify-content: space-between; flex-wrap: wrap;">
+                <button class="btn btn-outline" id="copyFullBtn"><i class="far fa-copy"></i> Copy blueprint</button>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="goToStep(1)"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const API_CONFIG = {{ api_config|tojson|safe }};
+    const API_BASE_URL = API_CONFIG.API_BASE_URL || '';
+  
+    const API_TOKEN = API_CONFIG.API_TOKEN || '';
+    const HAS_CONFIG = API_CONFIG.HAS_CONFIG || false;
+
+    // ============================================
+    // STATE VARIABLES
+    // ============================================
+    let LAST_ID = null;
+    let isGenerating = false;
+    let currentOutline = [];
+    let currentFormData = {};
+
+    // DOM elements
+    const generateBtn = document.getElementById('generateBtn');
+    const copyFullBtn = document.getElementById('copyFullBtn');
+
+    // ============================================
+    // COLLECT FORM DATA
+    // ============================================
+    function collectFormData() {
+        return {
+            assignment_title: document.getElementById('title').value.trim(),
+            brief: document.getElementById('brief').value.trim(),
+            word_count: parseInt(document.getElementById('wordCount').value, 10),
+            academic_level: document.getElementById('academicLevel').value,
+            structure: document.getElementById('structure').value.trim(),
+            key_points: document.getElementById('keypoints').value.trim(),
+            content_type: document.getElementById('contentType').value,
+            referencing_style: document.getElementById('referencingStyle').value,
+            writing_style: document.getElementById('writingStyle').value,
+            person: document.getElementById('person').value,
+            english_variant: document.getElementById('variant').value,
+            special_instructions: document.getElementById('specialInstructions').value.trim(),
+        };
+    }
+
+    // ============================================
+    // STEP NAVIGATION
+    // ============================================
+    window.goToStep = function(step) {
+        document.querySelectorAll('.step').forEach((el, idx) => {
+            const s = idx + 1;
+            el.classList.toggle('active', s === step);
+            el.classList.toggle('done', s < step);
+        });
+
+        document.getElementById('step1Panel').style.display = step === 1 ? 'block' : 'none';
+        document.getElementById('step2Panel').style.display = step === 2 ? 'block' : 'none';
+        document.getElementById('step3Panel').style.display = step === 3 ? 'block' : 'none';
+        document.getElementById('step4Panel').style.display = step === 4 ? 'block' : 'none';
+
+        if (step === 4 && !LAST_ID) {
+            generateBlueprint();
+        }
+    };
+
+    // ============================================
+    // GENERATE BLUEPRINT
+    // ============================================
+    async function generateBlueprint() {
+        if (isGenerating) return;
+        isGenerating = true;
+
+        const formData = collectFormData();
+
+        // Basic validation
+        if (!formData.assignment_title || !formData.brief) {
+            showToast('Please fill in the Topic and Brief fields.', 'error');
+            goToStep(1);
+            isGenerating = false;
+            return;
+        }
+
+        // Show loading state
+        const generateBtn = document.getElementById('generateBtn');
+        const originalText = generateBtn.innerHTML;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Generating...';
+        generateBtn.disabled = true;
+
+        // Show loading in preview
+        const container = document.getElementById('previewContainer');
+        container.innerHTML = `
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <strong>Generating your blueprint...</strong>
+                <p>Please wait while AI structures your content</p>
+            </div>
+        `;
+
+        try {
+            const apiUrl = `${API_BASE_URL}/structure-builder/preview`;
+            
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            };
+
+            const token = (API_TOKEN || '').trim();
+            if (token) {
+                headers['X-API-TOKEN'] = token;
+            }
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Generation failed');
+            }
+
+            const data = await response.json();
+            LAST_ID = data.id;
+            currentOutline = data.structured_outline || data.sections || [];
+            currentFormData = formData;
+
+            // Render the blueprint
+            renderBlueprint(currentOutline, currentFormData);
+            goToStep(4);
+            showToast('Blueprint generated successfully!');
+        } catch (error) {
+            console.error('Error:', error);
+            showToast(error.message || 'Generation failed', 'error');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                    <p><strong>Error generating blueprint</strong></p>
+                    <p class="text-muted">${escapeHtml(error.message || 'Please try again')}</p>
+                </div>
+            `;
+            goToStep(3);
+        } finally {
+            generateBtn.innerHTML = originalText;
+            generateBtn.disabled = false;
+            isGenerating = false;
+        }
+    }
+
+    // ============================================
+    // RENDER BLUEPRINT
+    // ============================================
+    function renderBlueprint(outline, formData) {
+        const container = document.getElementById('previewContainer');
+        if (!container) return;
+
+        if (!outline || outline.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>No blueprint data available.</p></div>';
+            return;
+        }
+
+        let html = `
+            <div class="blueprint-meta">
+                <h3>${escapeHtml(formData.assignment_title)}</h3>
+                <p>
+                    <strong>Type:</strong> ${formData.content_type} |
+                    <strong>Level:</strong> ${formData.academic_level} |
+                    <strong>Total Word Count:</strong> ${formData.word_count}
+                </p>
+            </div>
+
+            <div class="blueprint-table">
+                <div class="blueprint-table-header">
+                    <div class="col-section">Section</div>
+                    <div class="col-words">Words</div>
+                </div>
+        `;
+
+        let total = 0;
+
+        outline.forEach((section, idx) => {
+            const words = parseInt(section.word_count || 0, 10);
+            total += words;
+
+            html += `
+                <div class="blueprint-table-row">
+                    <div class="col-section">${idx + 1}. ${escapeHtml(section.title)}</div>
+                    <div class="col-words">${words}</div>
+                </div>
+            `;
+        });
+
+        html += `
+                <div class="blueprint-table-total">
+                    <div class="col-section">Total</div>
+                    <div class="col-words">${total}</div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    }
+
+    // ============================================
+    // COPY BLUEPRINT
+    // ============================================
+    function copyFullBlueprint() {
+        if (!currentOutline || currentOutline.length === 0) {
+            showToast('Nothing to copy', 'error');
+            return;
+        }
+
+        let text = currentFormData.assignment_title + "\n\n";
+
+        currentOutline.forEach((s, i) => {
+            const words = s.word_count || 0;
+            text += `${i + 1}. ${s.title} - ${words} words\n`;
+        });
+
+        text += `\nTotal: ${currentOutline.reduce((sum, s) => sum + (parseInt(s.word_count) || 0), 0)} words`;
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Blueprint copied successfully!');
+            }).catch(() => {
+                copyTextFallback(text);
+            });
+        } else {
+            copyTextFallback(text);
+        }
+    }
+
+    function copyTextFallback(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Blueprint copied successfully!');
+    }
+
+    // ============================================
+    // TOAST HELPER
+    // ============================================
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toastMsg');
+        if (!toast) return;
+        
+        const icon = toast.querySelector('i');
+        const text = toast.querySelector('span');
+        
+        text.textContent = msg;
+        icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+        
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============================================
+    // ESCAPE HTML
+    // ============================================
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    generateBtn?.addEventListener('click', generateBlueprint);
+    copyFullBtn?.addEventListener('click', copyFullBlueprint);
+
+    document.querySelectorAll('.step').forEach(el => {
+        el.addEventListener('click', () => {
+            const step = parseInt(el.dataset.step);
+            if (step === 4 && !LAST_ID) {
+                generateBlueprint();
+            } else {
+                goToStep(step);
+            }
+        });
+    });
+
+    // Enter key support for text inputs
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+            const currentStep = document.querySelector('.step.active');
+            if (currentStep) {
+                const step = parseInt(currentStep.dataset.step);
+                if (step < 4) {
+                    goToStep(step + 1);
+                }
+            }
+        }
+    });
+
+    // Initialize: show step 1
+    goToStep(1);
+
+    console.log('🚀 Content Creator initialized');
+    console.log('📡 API URL:', API_BASE_URL);
+</script>
+{% endblock %}

@@ -1,0 +1,301 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Home - Content Creator{% endblock %}
+
+{% block styles %}
+<style>
+    /* ===== HOME PAGE STYLES ===== */
+    .page-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    /* ===== HERO SECTION ===== */
+    .hero-section {
+        padding: 3rem 0;
+        text-align: center;
+    }
+
+    .hero-section .hero-icon {
+        font-size: 4rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+
+    .hero-section h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .hero-section h1 .highlight {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        line-height: 1.7;
+    }
+
+    .hero-section .btn {
+        padding: 0.8rem 2.5rem;
+        font-size: 1rem;
+    }
+
+    /* ===== FEATURES GRID ===== */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .feature-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: var(--shadow-sm);
+        text-decoration: none;
+        color: var(--text-primary);
+        display: block;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-card-hover);
+        border-color: var(--primary);
+    }
+
+    .feature-card .feature-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+    }
+
+    .feature-card .feature-icon.purple {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .feature-card .feature-icon.green {
+        background: var(--success-light);
+        color: var(--success);
+    }
+
+    .feature-card .feature-icon.orange {
+        background: var(--warning-light);
+        color: var(--warning);
+    }
+
+    .feature-card .feature-icon.blue {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+
+    .feature-card h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .feature-card p {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+        line-height: 1.6;
+    }
+
+    .feature-card .feature-badge {
+        display: inline-block;
+        margin-top: 0.75rem;
+        padding: 0.2rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    [data-bs-theme="dark"] .feature-card .feature-badge {
+        background: rgba(24, 95, 165, 0.2);
+        color: #60a5fa;
+    }
+
+    /* ===== STATS SECTION ===== */
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 3rem;
+        padding-top: 3rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-item .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .stat-item .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 0.25rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+        
+        .hero-section p {
+            font-size: 1rem;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .stats-section {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-section {
+            padding: 2rem 0;
+        }
+        
+        .hero-section .hero-icon {
+            font-size: 3rem;
+        }
+        
+        .hero-section h1 {
+            font-size: 1.75rem;
+        }
+        
+        .stats-section {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <!-- HERO SECTION -->
+    <section class="hero-section animate-fade-in">
+        <div class="hero-icon">
+            <i class="fas fa-pen-fancy"></i>
+        </div>
+        <h1>
+            AI-Powered<br>
+            <span class="highlight">Academic Toolkit</span>
+        </h1>
+        <p>
+            Streamline your academic workflow with intelligent tools for content creation,
+            document analysis, and quality assurance.
+        </p>
+        <a href="{{ url_for('web.content_creator_create') }}" class="btn btn-primary">
+            <i class="fas fa-rocket me-2"></i> Get Started
+        </a>
+    </section>
+
+    <!-- FEATURES GRID -->
+    <div class="features-grid">
+        <!-- Content Creator -->
+        <a href="{{ url_for('web.content_creator_create') }}" class="feature-card animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="feature-icon purple">
+                <i class="fas fa-drafting-compass"></i>
+            </div>
+            <h3>Content Creator</h3>
+            <p>Generate structured academic blueprints with AI assistance. Define your brief, structure, and preferences.</p>
+            <span class="feature-badge"><i class="fas fa-arrow-right me-1"></i> Create Blueprint</span>
+        </a>
+
+        <!-- Grade Advisor -->
+        <a href="{{ url_for('web.great_advisor') }}" class="feature-card animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="feature-icon green">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3>Grade Advisor</h3>
+            <p>AI-powered assignment evaluation with detailed feedback. Get instant grading and improvement suggestions.</p>
+            <span class="feature-badge"><i class="fas fa-arrow-right me-1"></i> Evaluate Now</span>
+        </a>
+
+        <!-- Reference Collector -->
+        <a href="{{ url_for('web.reference_collector') }}" class="feature-card animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="feature-icon orange">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>Reference Collector</h3>
+            <p>Intelligent literature discovery. Find relevant academic references from multiple scholarly databases.</p>
+            <span class="feature-badge"><i class="fas fa-arrow-right me-1"></i> Find References</span>
+        </a>
+
+        <!-- QA Checker -->
+        <a href="{{ url_for('web.qa_checker_openai') }}" class="feature-card animate-fade-in" style="animation-delay: 0.4s;">
+            <div class="feature-icon blue">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h3>QA Checker</h3>
+            <p>Comprehensive document quality analysis. Check formatting, grammar, content quality, citations, and more.</p>
+            <span class="feature-badge"><i class="fas fa-arrow-right me-1"></i> Analyze Document</span>
+        </a>
+    </div>
+
+    <!-- STATS SECTION -->
+    <div class="stats-section">
+        <div class="stat-item">
+            <div class="stat-number">4+</div>
+            <div class="stat-label">AI-Powered Tools</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Free to Use</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Available</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">Instant</div>
+            <div class="stat-label">Results</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    console.log('🏠 Home page loaded');
+</script>
+{% endblock %}

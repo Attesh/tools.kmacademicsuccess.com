@@ -1,0 +1,1108 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Reference Collector - Literature Discovery{% endblock %}
+
+{% block styles %}
+<style>
+    /* ===== PAGE CONTAINER ===== */
+    .page-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    
+    .page-header {
+        margin-top: 80px;
+    }
+
+    /* ===== HERO HEADER ===== */
+    .hero-header {
+        background: var(--gradient-primary);
+        border-radius: var(--radius-lg);
+        padding: 2rem 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(24, 95, 165, 0.3);
+        margin-bottom: 1.5rem;
+    }
+    
+    [data-bs-theme="dark"] .hero-header {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .hero-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .hero-header .hero-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .hero-header h1 {
+        color: white;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    .hero-header p {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+    }
+    
+    .hero-header .badge {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.35rem 1rem;
+    }
+
+    /* ===== PANEL CARDS ===== */
+    .panel-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        margin-bottom: 1.25rem;
+    }
+
+    .panel-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .panel-card .card-header {
+        padding: 0.875rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--bg-header);
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .panel-card .card-header i {
+        color: var(--primary);
+        width: 1.25rem;
+        text-align: center;
+    }
+
+    .panel-card .card-body {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* ===== FORM ELEMENTS ===== */
+    .form-control-custom {
+        background: var(--bg-input);
+        border: 2px solid var(--border-color-solid);
+        border-radius: var(--radius-sm);
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-family: inherit;
+        width: 100%;
+        transition: all 0.3s ease;
+        color: var(--text-primary);
+    }
+
+    .form-control-custom:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(24, 95, 165, 0.1);
+        outline: none;
+        background: var(--bg-input-focus);
+    }
+
+    .form-control-custom::placeholder {
+        color: var(--text-light);
+    }
+
+    .form-control-custom option {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    textarea.form-control-custom {
+        resize: vertical;
+        line-height: 1.6;
+        min-height: 80px;
+    }
+
+    select.form-control-custom {
+        appearance: auto;
+        cursor: pointer;
+    }
+
+    .form-label-custom {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label-custom i {
+        color: var(--primary);
+        font-size: 0.8rem;
+        width: 1rem;
+    }
+
+    /* ===== CHIPS / TAGS ===== */
+    .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .chip {
+        background: var(--bg-input);
+        border: 2px solid var(--border-color-solid);
+        padding: 0.35rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--text-secondary);
+        font-family: inherit;
+    }
+
+    .chip:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .chip.active {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    [data-bs-theme="dark"] .chip.active {
+        background: rgba(24, 95, 165, 0.2);
+        color: #60a5fa;
+        border-color: #60a5fa;
+    }
+
+    /* ===== RANGE SLIDER ===== */
+    .form-range-custom {
+        width: 100%;
+        height: 6px;
+        background: var(--border-color-solid);
+        border-radius: 10px;
+        appearance: none;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .form-range-custom::-webkit-slider-thumb {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(24, 95, 165, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .form-range-custom::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+    }
+
+    .form-range-custom::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 8px rgba(24, 95, 165, 0.3);
+    }
+
+    .range-value {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.1rem;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    /* ===== FILE DROP ===== */
+    .file-drop {
+        border: 2px dashed var(--border-color-solid);
+        border-radius: var(--radius-sm);
+        padding: 1rem;
+        text-align: center;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--bg-input);
+        font-size: 0.85rem;
+    }
+
+    .file-drop:hover {
+        border-color: var(--primary);
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .file-drop i {
+        margin-right: 0.5rem;
+    }
+
+    /* ===== OUTPUT PANEL ===== */
+    .output-panel {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        max-height: 85vh;
+        overflow-y: auto;
+        transition: all 0.3s ease;
+    }
+
+    .output-panel::-webkit-scrollbar {
+        width: 6px;
+    }
+    .output-panel::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+    .output-panel::-webkit-scrollbar-thumb {
+        background: var(--text-light);
+        border-radius: 3px;
+    }
+    .output-panel::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+
+    .output-header {
+        background: var(--bg-header);
+        padding: 0.875rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+    }
+
+    .output-body {
+        padding: 1.25rem;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state i {
+        font-size: 3.5rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+        display: block;
+        color: var(--text-muted);
+    }
+
+    .empty-state strong {
+        color: var(--text-primary);
+    }
+
+    /* ===== REFERENCE CARD ===== */
+    .ref-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .ref-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-sm);
+        transform: translateX(4px);
+    }
+
+    .ref-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .ref-authors {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .ref-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .meta-chip {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 50px;
+        background: var(--bg-input);
+        color: var(--text-secondary);
+        display: inline-block;
+        font-weight: 500;
+    }
+
+    .meta-chip.chip-oa { background: var(--bg-alert-success); color: #065f46; }
+    .meta-chip.chip-pw { background: var(--bg-alert-danger); color: #991b1b; }
+    .meta-chip.chip-cite { background: var(--bg-alert-warning); color: #92400e; }
+
+    [data-bs-theme="dark"] .meta-chip.chip-oa { background: #065f46; color: #d1fae5; }
+    [data-bs-theme="dark"] .meta-chip.chip-pw { background: #7f1d1d; color: #fca5a5; }
+    [data-bs-theme="dark"] .meta-chip.chip-cite { background: #78350f; color: #fbbf24; }
+
+    /* ===== PROVIDERS BADGE ===== */
+    .providers-badge {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .provider-chip {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.6rem;
+        border-radius: 50px;
+        background: var(--bg-input);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+
+    .provider-chip i {
+        margin-right: 0.25rem;
+        font-size: 0.6rem;
+    }
+
+    /* ===== PROGRESS ===== */
+    .rc-progress-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .rc-prog-step {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-input);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+    }
+
+    .rc-prog-step.done {
+        border-color: var(--success);
+        color: var(--success);
+        background: var(--bg-alert-success);
+    }
+
+    .rc-prog-step.active-step {
+        border-color: var(--primary);
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    [data-bs-theme="dark"] .rc-prog-step.active-step {
+        background: rgba(24, 95, 165, 0.15);
+    }
+
+    .rc-prog-step-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .rc-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--border-color);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        flex-shrink: 0;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .rc-progress-bar-outer {
+        height: 6px;
+        background: var(--border-color);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .rc-progress-bar-inner {
+        height: 100%;
+        background: var(--gradient-primary);
+        width: 0%;
+        transition: width 0.4s ease;
+        border-radius: 10px;
+    }
+
+    /* ===== BADGES ===== */
+    .badge-custom {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.7rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .page-wrapper {
+            padding: 0.75rem;
+        }
+        .output-panel {
+            max-height: 60vh;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-header {
+            padding: 1.5rem;
+        }
+        .hero-header .hero-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
+        .hero-header h1 {
+            font-size: 1.5rem;
+        }
+        .panel-card .card-body {
+            padding: 1rem;
+        }
+        .output-header {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch !important;
+        }
+        .output-header .d-flex {
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .chip {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+        }
+        .ref-card {
+            padding: 0.75rem 1rem;
+        }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+        .hero-header .badge,
+        .btn,
+        .no-print {
+            display: none !important;
+        }
+        .panel-card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+        .output-panel {
+            max-height: none;
+            overflow: visible;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <!-- HERO HEADER -->
+    <div class="page-header">
+        <div class="hero-header animate-fade-in">
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                <div class="hero-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h1 class="mb-1">Reference Collector</h1>
+                    <p class="mb-2">AI-powered literature discovery for your academic work</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge"><i class="fas fa-robot me-1"></i> AI Powered</span>
+                        <span class="badge"><i class="fas fa-book me-1"></i> Scholarly Sources</span>
+                        <span class="badge"><i class="fas fa-bolt me-1"></i> Fast Discovery</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO ALERT -->
+    <div class="alert alert-info d-flex align-items-center gap-3 animate-fade-in" role="alert">
+        <i class="fas fa-lightbulb fa-lg"></i>
+        <div>
+            <strong>Smart literature discovery:</strong> Paste your brief and structure, then let AI find relevant academic references.
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- LEFT: Input Panel -->
+        <div class="col-lg-6">
+            <!-- Assignment Brief -->
+            <div class="panel-card animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="card-header">
+                    <i class="fas fa-file-alt"></i> Assignment Brief
+                </div>
+                <div class="card-body">
+                    <textarea id="rc-brief" class="form-control-custom" rows="6" placeholder="Paste your assignment brief here…"></textarea>
+                </div>
+            </div>
+
+            <!-- Writing Structure -->
+            <div class="panel-card animate-fade-in" style="animation-delay: 0.15s;">
+                <div class="card-header">
+                    <i class="fas fa-sitemap"></i> Writing Structure
+                </div>
+                <div class="card-body">
+                    <textarea id="rc-structure" class="form-control-custom" rows="5" placeholder="Paste your writing structure (headings, sections)…"></textarea>
+                    <div class="file-drop" onclick="document.getElementById('rc-file-input').click()">
+                        <i class="fas fa-upload"></i> Import .txt or .docx structure file
+                        <input type="file" id="rc-file-input" accept=".txt,.docx" style="display:none" onchange="handleRcFile(this)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration -->
+            <div class="panel-card animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="card-header">
+                    <i class="fas fa-sliders-h"></i> Configuration
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-custom"><i class="fas fa-quote-right"></i> Citation Style</label>
+                            <select id="rc-cite-style" class="form-control-custom">
+                                <option>APA 7th</option>
+                                <option>MLA 9th</option>
+                                <option>Chicago 17th</option>
+                                <option>Harvard</option>
+                                <option>IEEE</option>
+                                <option>Vancouver</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom"><i class="fas fa-calendar-alt"></i> Source Recency</label>
+                            <select id="rc-recency" class="form-control-custom">
+                                <option>Last 3 years</option>
+                                <option selected>Last 5 years</option>
+                                <option>Last 6 years</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label-custom"><i class="fas fa-list-ol"></i> Number of References</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="range" id="rc-ref-count" class="form-range-custom" min="5" max="50" value="15" step="1">
+                                <span id="rc-count-val" class="range-value">15</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Source Types -->
+            <div class="panel-card animate-fade-in" style="animation-delay: 0.25s;">
+                <div class="card-header">
+                    <i class="fas fa-tags"></i> Source Types
+                </div>
+                <div class="card-body">
+                    <div class="chip-group" id="rc-source-types">
+                        <div class="chip active" data-type="Journal Articles">Journal Articles</div>
+                        <div class="chip active" data-type="Books">Books</div>
+                        <div class="chip active" data-type="Conference Papers">Conference Papers</div>
+                        <div class="chip active" data-type="Reports">Reports</div>
+                        <div class="chip" data-type="Theses">Theses</div>
+                        <div class="chip" data-type="Preprints">Preprints</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Button -->
+            <button type="button" id="rc-search-btn" class="btn btn-primary btn-lg w-100 py-3 d-flex align-items-center justify-content-center gap-2 animate-fade-in" style="animation-delay: 0.3s;">
+                <i class="fas fa-magic"></i> Find References
+            </button>
+        </div>
+
+        <!-- RIGHT: Results Panel -->
+        <div class="col-lg-6">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-clipboard-list text-success"></i>
+                    <h5 class="mb-0 fw-semibold">Literature Matches</h5>
+                    <span class="badge bg-success text-white">Live</span>
+                </div>
+                <div id="copyToastMsg" class="small text-muted" style="opacity:0; transition:0.2s;">
+                    <i class="fas fa-check-circle text-success"></i> Copied!
+                </div>
+            </div>
+
+            <div class="output-panel" id="rc-results-container">
+                <!-- Empty State -->
+                <div id="rc-empty-state" class="empty-state">
+                    <i class="fas fa-robot"></i>
+                    <p>Fill in the brief and structure, then click <strong>Find References</strong><br>to start intelligent literature discovery.</p>
+                </div>
+
+                <!-- Progress State -->
+                <div id="rc-progress-state" style="display:none;" class="p-4">
+                    <div class="text-center mb-4">
+                        <div class="rc-spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto;"></div>
+                        <h6 class="mt-3 fw-bold">Searching scholarly databases...</h6>
+                        <p class="text-muted small">Please wait while we find relevant references</p>
+                    </div>
+                    <div id="rc-progress-steps"></div>
+                    <div class="rc-progress-bar-outer">
+                        <div class="rc-progress-bar-inner" id="rc-progress-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Results State -->
+                <div id="rc-results-state" style="display:none;">
+                    <div class="output-header">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="fw-bold" id="rc-result-count">0 references</span>
+                                <span class="badge-custom bg-primary-subtle text-primary ms-2" id="rc-style-badge">APA 7th</span>
+                                <span class="badge-custom bg-success-subtle text-success ms-2" id="rc-providers-badge">
+                                    <i class="fas fa-database"></i> <span id="rc-providers-count">0</span> sources
+                                </span>
+                            </div>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-sm btn-outline-primary" id="rc-copy-all-btn">
+                                    <i class="far fa-copy"></i> Copy all
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" id="rc-export-bib">
+                                    <i class="fas fa-download"></i> BibTeX
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Query info -->
+                        <div id="rc-query-info" class="mt-2 small text-muted" style="display:none;">
+                            <i class="fas fa-search"></i> Query: <span id="rc-query-text"></span>
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-database"></i> Providers: <span id="rc-providers-list"></span>
+                        </div>
+                    </div>
+                    <div id="rc-results-list" class="output-body"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="rc-toast" class="toast-msg">Copied!</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const API_CONFIG = {{ api_config|tojson|safe }};
+    const API_BASE_URL = API_CONFIG.API_BASE_URL || '';
+    const API_TOKEN = API_CONFIG.API_TOKEN || '';
+    const HAS_CONFIG = API_CONFIG.HAS_CONFIG || false;
+
+    // ============================================
+    // RANGE SLIDER
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const range = document.getElementById('rc-ref-count');
+        const display = document.getElementById('rc-count-val');
+        
+        range.addEventListener('input', function() {
+            display.textContent = this.value;
+        });
+    });
+
+    // ============================================
+    // CHIP SELECTION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const chips = document.querySelectorAll('.chip');
+        chips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+    });
+
+    // ============================================
+    // FILE UPLOAD HANDLER
+    // ============================================
+    window.handleRcFile = function(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                document.getElementById('rc-structure').value = e.target.result;
+                showToast('File imported: ' + file.name);
+            };
+            
+            reader.readAsText(file);
+        }
+    };
+
+    // ============================================
+    // SEARCH FUNCTION
+    // ============================================
+    document.getElementById('rc-search-btn').addEventListener('click', function() {
+        const brief = document.getElementById('rc-brief').value.trim();
+        const structure = document.getElementById('rc-structure').value.trim();
+        
+        if (!brief || !structure) {
+            showToast('Please fill in both Brief and Structure fields', 'error');
+            return;
+        }
+
+        // Get selected source types
+        const selectedTypes = [];
+        document.querySelectorAll('#rc-source-types .chip.active').forEach(chip => {
+            selectedTypes.push(chip.dataset.type);
+        });
+
+        const data = {
+            brief: brief,
+            structure: structure,
+            cite_style: document.getElementById('rc-cite-style').value,
+            recency: document.getElementById('rc-recency').value,
+            ref_count: parseInt(document.getElementById('rc-ref-count').value),
+            source_types: selectedTypes
+        };
+
+        // Show progress
+        document.getElementById('rc-empty-state').style.display = 'none';
+        document.getElementById('rc-results-state').style.display = 'none';
+        document.getElementById('rc-progress-state').style.display = 'block';
+        
+        // Animate progress steps
+        simulateProgress();
+
+        // Make API call
+        fetch(`${API_BASE_URL}/reference-collector/search`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-TOKEN': API_TOKEN
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(response => {
+            console.log('📚 API Response:', response);
+            
+            if (response.status === true) {
+                // Handle the response structure
+                const references = response.data || [];
+                const meta = {
+                    total: response.total_found || references.length,
+                    query: response.query_used || '',
+                    providers: response.providers_used || [],
+                    cite_style: document.getElementById('rc-cite-style').value
+                };
+                
+                displayResults(references, meta);
+                showToast('Found ' + references.length + ' references from ' + meta.providers.length + ' sources');
+            } else {
+                showToast(response.message || 'Search failed', 'error');
+                resetToEmpty();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Network error. Please try again.', 'error');
+            resetToEmpty();
+        });
+    });
+
+    // ============================================
+    // SIMULATE PROGRESS
+    // ============================================
+    function simulateProgress() {
+        const steps = [
+            { label: 'Analyzing your brief...', done: false },
+            { label: 'Mapping to scholarly databases...', done: false },
+            { label: 'Retrieving relevant sources...', done: false },
+            { label: 'Formatting results...', done: false }
+        ];
+
+        const container = document.getElementById('rc-progress-steps');
+        const bar = document.getElementById('rc-progress-bar');
+        
+        container.innerHTML = steps.map((step, idx) => `
+            <div class="rc-prog-step" data-step="${idx}">
+                <span class="rc-prog-step-icon">${idx + 1}</span>
+                <span>${step.label}</span>
+            </div>
+        `).join('');
+
+        let currentStep = 0;
+        const interval = setInterval(() => {
+            if (currentStep < steps.length) {
+                const stepEl = container.querySelector(`[data-step="${currentStep}"]`);
+                if (stepEl) {
+                    stepEl.classList.add('active-step');
+                    if (currentStep > 0) {
+                        const prevEl = container.querySelector(`[data-step="${currentStep - 1}"]`);
+                        if (prevEl) {
+                            prevEl.classList.remove('active-step');
+                            prevEl.classList.add('done');
+                            prevEl.querySelector('.rc-prog-step-icon').textContent = '✓';
+                        }
+                    }
+                }
+                bar.style.width = ((currentStep + 1) / steps.length * 100) + '%';
+                currentStep++;
+            } else {
+                clearInterval(interval);
+            }
+        }, 800);
+    }
+
+    // ============================================
+    // DISPLAY RESULTS
+    // ============================================
+    function displayResults(references, meta) {
+        document.getElementById('rc-progress-state').style.display = 'none';
+        document.getElementById('rc-results-state').style.display = 'block';
+        
+        // Update counts
+        document.getElementById('rc-result-count').textContent = (meta.total || references.length) + ' references';
+        document.getElementById('rc-style-badge').textContent = meta.cite_style || 'APA 7th';
+        document.getElementById('rc-providers-count').textContent = meta.providers ? meta.providers.length : 0;
+        
+        // Show query info
+        if (meta.query) {
+            document.getElementById('rc-query-info').style.display = 'block';
+            document.getElementById('rc-query-text').textContent = meta.query;
+        }
+        
+        // Show providers
+        if (meta.providers && meta.providers.length > 0) {
+            document.getElementById('rc-providers-list').innerHTML = meta.providers.map(p => 
+                `<span class="provider-chip"><i class="fas fa-circle" style="font-size:0.4rem;"></i> ${escapeHtml(p)}</span>`
+            ).join('');
+        }
+
+        const list = document.getElementById('rc-results-list');
+        
+        if (!references || references.length === 0) {
+            list.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>No references found. Try adjusting your search criteria.</p></div>';
+            return;
+        }
+
+        list.innerHTML = references.map((ref, index) => `
+            <div class="ref-card">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div class="flex-grow-1">
+                        <div class="ref-title">${index + 1}. ${escapeHtml(ref.title || 'Untitled')}</div>
+                        <div class="ref-authors">${escapeHtml(ref.authors || 'Unknown authors')}</div>
+                    </div>
+                    ${ref.year ? `<span class="badge bg-primary-subtle text-primary" style="font-size:0.7rem;padding:0.2rem 0.6rem;">${escapeHtml(ref.year)}</span>` : ''}
+                </div>
+                <div class="ref-meta">
+                    ${ref.journal ? `<span class="meta-chip"><i class="fas fa-book"></i> ${escapeHtml(ref.journal)}</span>` : ''}
+                    ${ref.volume ? `<span class="meta-chip">Vol. ${escapeHtml(ref.volume)}</span>` : ''}
+                    ${ref.issue ? `<span class="meta-chip">Issue ${escapeHtml(ref.issue)}</span>` : ''}
+                    ${ref.pages ? `<span class="meta-chip">pp. ${escapeHtml(ref.pages)}</span>` : ''}
+                    ${ref.publisher ? `<span class="meta-chip"><i class="fas fa-building"></i> ${escapeHtml(ref.publisher)}</span>` : ''}
+                    ${ref.type ? `<span class="meta-chip">${escapeHtml(ref.type)}</span>` : ''}
+                    ${ref.open_access ? `<span class="meta-chip chip-oa"><i class="fas fa-unlock"></i> Open Access</span>` : ''}
+                    ${ref.cited_by ? `<span class="meta-chip chip-cite"><i class="fas fa-quote-right"></i> Cited by ${escapeHtml(ref.cited_by)}</span>` : ''}
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-1">
+                    ${ref.doi ? `<a href="https://doi.org/${escapeHtml(ref.doi)}" target="_blank" class="text-primary small"><i class="fas fa-external-link-alt"></i> DOI: ${escapeHtml(ref.doi)}</a>` : ''}
+                    ${ref.url ? `<a href="${escapeHtml(ref.url)}" target="_blank" class="text-primary small"><i class="fas fa-external-link-alt"></i> View</a>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ============================================
+    // RESET TO EMPTY STATE
+    // ============================================
+    function resetToEmpty() {
+        document.getElementById('rc-progress-state').style.display = 'none';
+        document.getElementById('rc-results-state').style.display = 'none';
+        document.getElementById('rc-empty-state').style.display = 'block';
+    }
+
+    // ============================================
+    // COPY ALL
+    // ============================================
+    document.getElementById('rc-copy-all-btn').addEventListener('click', function() {
+        const refs = document.querySelectorAll('#rc-results-list .ref-card');
+        if (refs.length === 0) return;
+        
+        let text = '';
+        refs.forEach((ref, index) => {
+            const title = ref.querySelector('.ref-title')?.textContent || '';
+            const authors = ref.querySelector('.ref-authors')?.textContent || '';
+            const year = ref.querySelector('.badge')?.textContent || '';
+            text += `${index + 1}. ${title}\n${authors}\nYear: ${year}\n\n`;
+        });
+
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('copyToastMsg');
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2000);
+        }).catch(() => {
+            // Fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            const toast = document.getElementById('copyToastMsg');
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2000);
+        });
+    });
+
+    // ============================================
+    // EXPORT BIBTEX
+    // ============================================
+    document.getElementById('rc-export-bib').addEventListener('click', function() {
+        const refs = document.querySelectorAll('#rc-results-list .ref-card');
+        if (refs.length === 0) {
+            showToast('No references to export', 'error');
+            return;
+        }
+        
+        let bibtex = '';
+        refs.forEach((ref, index) => {
+            const title = ref.querySelector('.ref-title')?.textContent?.replace(/^\d+\.\s*/, '') || '';
+            const authors = ref.querySelector('.ref-authors')?.textContent || '';
+            const year = ref.querySelector('.badge')?.textContent || '2024';
+            const journal = ref.querySelector('.meta-chip .fa-book')?.parentElement?.textContent || '';
+            
+            bibtex += `@article{ref${index + 1},\n`;
+            bibtex += `  author = {${authors}},\n`;
+            bibtex += `  title = {${title}},\n`;
+            bibtex += `  year = {${year}},\n`;
+            bibtex += `  journal = {${journal}}\n`;
+            bibtex += `}\n\n`;
+        });
+
+        // Download as .bib file
+        const blob = new Blob([bibtex], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'references.bib';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('BibTeX exported successfully');
+    });
+
+    // ============================================
+    // TOAST HELPER
+    // ============================================
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('rc-toast');
+        if (!toast) return;
+        
+        toast.textContent = msg;
+        toast.style.background = type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981';
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============================================
+    // ESCAPE HTML
+    // ============================================
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    console.log('📚 Reference Collector initialized');
+</script>
+{% endblock %}

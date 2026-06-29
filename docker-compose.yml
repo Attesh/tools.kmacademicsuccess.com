@@ -1,0 +1,41 @@
+services:
+  flask:
+    build: .
+    container_name: km-tools-flask
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/tools.kmacademicsuccess.com
+      - ./logs:/var/log/flask
+    working_dir: /var/www/tools.kmacademicsuccess.com
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+      - TZ=UTC
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - tools-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: km-tools-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"  # Or use 5001 if you want to test first
+    volumes:
+      - .:/var/www/tools.kmacademicsuccess.com
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - flask
+    networks:
+      - tools-network
+
+networks:
+  tools-network:
+    driver: bridge

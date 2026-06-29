@@ -1,0 +1,1123 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}QA Checker - Document Quality Analysis{% endblock %}
+
+{% block styles %}
+<style>
+    /* ===== PAGE CONTAINER ===== */
+    .page-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    
+    .page-header {
+        margin-top: 80px;
+    }
+
+    /* ===== HERO HEADER ===== */
+    .hero-header {
+        background: var(--gradient-primary);
+        border-radius: var(--radius-lg);
+        padding: 2rem 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(24, 95, 165, 0.3);
+        margin-bottom: 1.5rem;
+    }
+    
+    [data-bs-theme="dark"] .hero-header {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .hero-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    .hero-header .hero-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .hero-header h1 {
+        color: white;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    .hero-header p {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+    }
+    
+    .hero-header .badge {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.35rem 1rem;
+    }
+
+    /* ===== STAT CARDS ===== */
+    .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-card .stat-icon {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.2;
+    }
+
+    /* ===== UPLOAD CARDS ===== */
+    .upload-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .upload-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .upload-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .upload-zone {
+        border: 2px dashed var(--border-color-solid);
+        border-radius: var(--radius-sm);
+        padding: 1.5rem;
+        text-align: center;
+        background: var(--bg-input);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .upload-zone:hover {
+        border-color: var(--primary);
+        background: var(--primary-light);
+    }
+
+    .upload-zone i {
+        font-size: 2rem;
+        color: var(--primary);
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    [data-bs-theme="dark"] .upload-zone:hover {
+        background: rgba(24, 95, 165, 0.1);
+    }
+
+    /* ===== TEXTAREA ===== */
+    .textarea-custom {
+        background: var(--bg-input);
+        border: 2px solid var(--border-color-solid);
+        border-radius: var(--radius-sm);
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-family: inherit;
+        width: 100%;
+        transition: all 0.3s ease;
+        color: var(--text-primary);
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .textarea-custom:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(24, 95, 165, 0.1);
+        outline: none;
+        background: var(--bg-input-focus);
+    }
+
+    .textarea-custom::placeholder {
+        color: var(--text-light);
+    }
+
+    /* ===== PROGRESS ===== */
+    .progress-sm {
+        height: 0.4rem;
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--border-color);
+    }
+
+    .progress-sm .progress-bar {
+        background: var(--gradient-primary);
+        border-radius: 10px;
+        transition: width 0.4s ease;
+    }
+
+    /* ===== BADGES ===== */
+    .badge-issue {
+        background: var(--bg-alert-danger);
+        color: #991b1b;
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
+    [data-bs-theme="dark"] .badge-issue {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+    }
+
+    .badge-suggestion {
+        background: var(--bg-alert-info);
+        color: var(--primary-dark);
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
+    [data-bs-theme="dark"] .badge-suggestion {
+        background: rgba(24, 95, 165, 0.2);
+        color: #60a5fa;
+    }
+
+    /* ===== RESULT CARDS ===== */
+    .result-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        height: 100%;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* ===== FORMAT SUB RULES ===== */
+    .format-sub-rules {
+        margin-left: 2rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding-left: 0.5rem;
+        border-left: 2px solid var(--border-color);
+    }
+
+    /* ===== CHECKBOX STYLES ===== */
+    .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    [data-bs-theme="dark"] .form-check-input {
+        background-color: var(--bg-input);
+        border-color: var(--border-color-solid);
+    }
+
+    [data-bs-theme="dark"] .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    /* ===== FILE INFO ===== */
+    .file-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg-input);
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-sm);
+        margin-top: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .file-info .file-name {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+    }
+
+    .file-info .file-name i {
+        margin-right: 0.5rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .page-wrapper {
+            padding: 0.75rem;
+        }
+        
+        .hero-header {
+            padding: 1.5rem;
+        }
+        
+        .hero-header .hero-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
+        
+        .hero-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 2rem;
+        }
+        
+        .upload-card .card-body {
+            padding: 1rem;
+        }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+        .hero-header .badge,
+        .btn,
+        .no-print {
+            display: none !important;
+        }
+        .stat-card,
+        .upload-card,
+        .result-card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <!-- HERO HEADER -->
+    <div class="page-header">
+        <div class="hero-header animate-fade-in">
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                <div class="hero-icon">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h1 class="mb-1">QA Checker</h1>
+                    <p class="mb-2">Comprehensive document quality analysis with AI-powered insights</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge"><i class="fas fa-robot me-1"></i> AI Powered</span>
+                        <span class="badge"><i class="fas fa-file-alt me-1"></i> Document Analysis</span>
+                        <span class="badge"><i class="fas fa-chart-line me-1"></i> Quality Scoring</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO ALERT -->
+    <div class="alert alert-info d-flex align-items-center gap-3 animate-fade-in" role="alert">
+        <i class="fas fa-lightbulb fa-lg"></i>
+        <div>
+            <strong>Quality Analysis:</strong> Upload your document and brief to get comprehensive feedback on formatting, grammar, content quality, citations, and more.
+        </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-star text-primary"></i></span>
+                <div class="stat-label">Overall Score</div>
+                <div class="stat-value text-primary" id="OverallScore">—</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-text-height text-info"></i></span>
+                <div class="stat-label">Total Word Count</div>
+                <div class="stat-value text-info" id="TotalWordCount">—</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-check-circle text-success"></i></span>
+                <div class="stat-label">Overall Judgment</div>
+                <div class="stat-value text-success" id="OverallJudgment" style="font-size: 1.5rem;">Pending</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPLOAD CARDS -->
+    <div class="row g-4 mb-4">
+        <!-- Document to analyze -->
+        <div class="col-md-4">
+            <div class="upload-card">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-file-alt text-primary me-2"></i> Document to analyze
+                    </h5>
+                    <div class="upload-zone" id="mainDocUploadZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p class="mt-2 mb-1 fw-semibold">Upload DOCX</p>
+                        <small class="text-muted">Only .docx, max 20 MB</small>
+                        <input type="file" id="mainDocInput" accept=".docx" style="display:none;" />
+                        <button class="btn btn-sm btn-outline-primary mt-3 rounded-pill" id="triggerMainUploadBtn">
+                            <i class="fas fa-folder-open"></i> Browse
+                        </button>
+                        <div id="mainUploadProgress" style="display:none;" class="mt-2">
+                            <div class="progress progress-sm">
+                                <div class="progress-bar" id="mainProgressBar" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="file-info">
+                        <span class="file-name"><i class="fas fa-file-word text-primary"></i> <span id="mainFileName">No file</span></span>
+                        <div>
+                            <a href="#" target="_blank" id="mainFileLink" class="btn btn-sm btn-outline-secondary rounded-circle me-1" style="display:none;">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <button id="clearMainFileBtn" class="btn btn-sm btn-outline-danger rounded-circle" style="display:none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignment Brief -->
+        <div class="col-md-4">
+            <div class="upload-card">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-file-text text-success me-2"></i> Assignment Brief
+                    </h5>
+                    <textarea id="qaBrief" class="textarea-custom" rows="8" placeholder="Paste your assignment brief here or upload a file..."></textarea>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-success rounded-pill" id="triggerBriefUploadBtn">
+                            <i class="fas fa-upload"></i> Upload File
+                        </button>
+                        <input type="file" id="briefFileInput" accept=".docx,.pdf,.txt" style="display:none;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outline / Structure -->
+        <div class="col-md-4">
+            <div class="upload-card">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-diagram-project text-warning me-2"></i> Outline / Structure
+                    </h5>
+                    <textarea id="qaOutline" class="textarea-custom" rows="8" placeholder="Paste your document outline or structure here..."></textarea>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-warning rounded-pill" id="triggerOutlineUploadBtn">
+                            <i class="fas fa-upload"></i> Upload File
+                        </button>
+                        <input type="file" id="outlineFileInput" accept=".docx,.pdf,.txt" style="display:none;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMAT & GRAMMAR CHECK -->
+    <div class="row g-4 mb-4">
+        <!-- Format Checker -->
+        <div class="col-md-6">
+            <div class="upload-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-semibold mb-0">
+                            <i class="fas fa-ruler text-primary me-2"></i> Document Format Checker
+                        </h5>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="formatCheckerToggle" style="width: 3rem; height: 1.5rem;">
+                            <label class="form-check-label text-muted small" for="formatCheckerToggle">Enable</label>
+                        </div>
+                    </div>
+                    <div id="formatRulesContainer" style="display: none;">
+                        <hr class="my-3">
+                        <div id="formatStylesList">
+                            <div class="text-muted small">Loading formatting styles...</div>
+                        </div>
+                        <div class="mt-3 text-muted small fst-italic">
+                            <i class="fas fa-info-circle"></i> Check a style to select all its rules, or pick individual rules.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grammar Check -->
+        <div class="col-md-6">
+            <div class="upload-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-semibold mb-0">
+                            <i class="fas fa-language text-success me-2"></i> Grammar Check
+                        </h5>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="grammarStyleToggle" style="width: 3rem; height: 1.5rem;" checked>
+                            <label class="form-check-label text-muted small" for="grammarStyleToggle">Enable</label>
+                        </div>
+                    </div>
+                    <div id="grammarStyleContainer">
+                        <hr class="my-3">
+                        <h6 class="fw-semibold mb-3">
+                            <i class="fas fa-comment-dots me-1"></i> Select dialect
+                        </h6>
+                        <div class="d-flex gap-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="grammarStyle" id="grammarUK" value="UK" checked>
+                                <label class="form-check-label" for="grammarUK">UK English</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="grammarStyle" id="grammarUS" value="US">
+                                <label class="form-check-label" for="grammarUS">US English</label>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-muted small fst-italic">
+                            <i class="fas fa-info-circle"></i> Applies to grammar and spelling checks.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QA MODULES -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="upload-card">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-sliders-h text-info me-2"></i> QA Modules
+                    </h5>
+                    <div class="d-flex flex-wrap align-items-center gap-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="qaContent" value="content" checked>
+                            <label class="form-check-label fw-medium" for="qaContent">📄 Content Quality</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="qaCitation" value="citation" checked>
+                            <label class="form-check-label fw-medium" for="qaCitation">📚 Citation & References</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="qaPlagiarism" value="plagiarism" checked>
+                            <label class="form-check-label fw-medium" for="qaPlagiarism">⚠️ Plagiarism Risk</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="qaAI" value="aiDetection" checked>
+                            <label class="form-check-label fw-medium" for="qaAI">🤖 AI Detection</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTION BUTTON -->
+    <div class="text-center my-4">
+        <button class="btn btn-primary btn-lg px-5 py-3" id="startQaBtn">
+            <i class="fas fa-play me-2"></i> Start QA Analysis
+        </button>
+    </div>
+
+    <!-- LOADER -->
+    <div id="qaLoader" class="text-center my-4" style="display:none;">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 fw-semibold text-secondary">Analyzing document quality...</p>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="qaResults" style="display:none;">
+        <div class="d-flex align-items-center gap-2 mb-3 mt-4">
+            <i class="fas fa-chart-bar fs-3 text-success"></i>
+            <h4 class="fw-bold mb-0">Quality Assessment</h4>
+        </div>
+        <div class="row g-4" id="qaResultsContent"></div>
+        <div class="mt-4 pt-3" id="qaDownloadSection">
+            <hr>
+            <div class="d-flex gap-3 flex-wrap">
+                <button id="sendToClientBtn" class="btn btn-success rounded-pill px-4 d-none">
+                    <i class="fas fa-download me-2"></i> Download Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toastMsg" class="toast-msg">
+    <i class="fas fa-check-circle"></i>
+    <span>Copied to clipboard</span>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const API_CONFIG = {{ api_config|tojson|safe }};
+    const API_BASE_URL = API_CONFIG.API_BASE_URL || '';
+    const API_TOKEN = API_CONFIG.API_TOKEN || '';
+    const HAS_CONFIG = API_CONFIG.HAS_CONFIG || false;
+
+    const URLS = {
+        upload_file: API_BASE_URL + '/upload-file',
+        extract_from_file: API_BASE_URL + '/upload-extract',
+        run_qa: API_BASE_URL + '/runOpenAi',
+        format_rules: API_BASE_URL + '/format-rules',
+    };
+
+    let clientPdfFileUrl = null;
+    let mainDocFileUrl = null;
+    let mainDocFileName = null;
+
+    // ============================================
+    // TOAST HELPER
+    // ============================================
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toastMsg');
+        if (!toast) return;
+        
+        const icon = toast.querySelector('i');
+        const text = toast.querySelector('span');
+        
+        text.textContent = msg;
+        icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+        toast.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.95)' : 'rgba(31, 41, 55, 0.95)';
+        
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============================================
+    // ESCAPE HTML
+    // ============================================
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ============================================
+    // FORMAT RULES
+    // ============================================
+    const formatCheckerToggle = document.getElementById('formatCheckerToggle');
+    const formatRulesContainer = document.getElementById('formatRulesContainer');
+    const formatStylesList = document.getElementById('formatStylesList');
+    let availableStyles = [];
+
+    async function loadFormatRules() {
+        try {
+            const response = await fetch(URLS.format_rules, {
+                headers: { 
+                    'X-API-TOKEN': API_TOKEN, 
+                    'Accept': 'application/json' 
+                }
+            });
+            const data = await response.json();
+            if (data.status && Array.isArray(data.styles)) {
+                availableStyles = data.styles;
+                renderStyles();
+            } else {
+                formatStylesList.innerHTML = '<div class="text-danger small">Failed to load formatting styles.</div>';
+            }
+        } catch (err) {
+            console.error(err);
+            formatStylesList.innerHTML = '<div class="text-danger small">Error loading styles.</div>';
+        }
+    }
+
+    function renderStyles() {
+        if (!availableStyles.length) {
+            formatStylesList.innerHTML = '<div class="text-muted small">No formatting styles configured.</div>';
+            return;
+        }
+
+        let html = '';
+        availableStyles.forEach((style, index) => {
+            const styleId = `style_${style.id}`;
+            const subContainerId = `subrules_${style.id}`;
+            const isFirst = (index === 0);
+            html += `
+                <div class="mb-3">
+                    <div class="form-check main-style-radio">
+                        <input class="form-check-input main-style-toggle" type="radio" name="mainFormatStyle" 
+                               id="${styleId}" data-style-id="${style.id}" ${isFirst ? 'checked' : ''}>
+                        <label class="form-check-label fw-semibold" for="${styleId}">
+                            <i class="fas fa-book me-1"></i> ${escapeHtml(style.name)}
+                        </label>
+                    </div>
+                    <div id="${subContainerId}" class="format-sub-rules" style="display: ${isFirst ? 'block' : 'none'};">
+                        ${style.sub_rules.map((rule, idx) => `
+                            <div class="form-check">
+                                <input class="form-check-input format-rule-checkbox" type="checkbox" 
+                                       value="${escapeHtml(rule)}" data-parent-style="${style.id}" 
+                                       id="rule_${style.id}_${idx}" ${isFirst ? 'checked' : ''}>
+                                <label class="form-check-label small" for="rule_${style.id}_${idx}">${escapeHtml(rule)}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        });
+        formatStylesList.innerHTML = html;
+
+        document.querySelectorAll('.main-style-toggle').forEach(radio => {
+            radio.addEventListener('change', function(e) {
+                const styleId = this.dataset.styleId;
+                document.querySelectorAll('.format-sub-rules').forEach(container => {
+                    container.style.display = 'none';
+                });
+                document.querySelectorAll('.format-rule-checkbox').forEach(cb => {
+                    cb.checked = false;
+                });
+                const subContainer = document.getElementById(`subrules_${styleId}`);
+                if (subContainer) {
+                    subContainer.style.display = 'block';
+                    const subCheckboxes = subContainer.querySelectorAll('.format-rule-checkbox');
+                    subCheckboxes.forEach(cb => cb.checked = true);
+                }
+            });
+        });
+    }
+
+    formatCheckerToggle.addEventListener('change', function() {
+        formatRulesContainer.style.display = this.checked ? 'block' : 'none';
+    });
+
+    loadFormatRules();
+
+    function getSelectedFormattingRules() {
+        if (!formatCheckerToggle.checked) return '';
+        const checkboxes = document.querySelectorAll('.format-rule-checkbox:checked');
+        return Array.from(checkboxes).map(cb => cb.value).join('\n');
+    }
+
+    // ============================================
+    // GRAMMAR CHECK
+    // ============================================
+    const grammarStyleToggle = document.getElementById('grammarStyleToggle');
+    const grammarStyleContainer = document.getElementById('grammarStyleContainer');
+
+    grammarStyleToggle.addEventListener('change', function() {
+        grammarStyleContainer.style.display = this.checked ? 'block' : 'none';
+    });
+
+    function getSelectedGrammarStyle() {
+        const selected = document.querySelector('input[name="grammarStyle"]:checked');
+        return selected ? selected.value : 'UK';
+    }
+
+    function getGrammarChecks() {
+        if (!grammarStyleToggle.checked) return null;
+        return { dialect: getSelectedGrammarStyle() };
+    }
+
+    // ============================================
+    // MAIN DOCUMENT UPLOAD
+    // ============================================
+    const mainDocInput = document.getElementById('mainDocInput');
+    const mainUploadZone = document.getElementById('mainDocUploadZone');
+    const mainProgressDiv = document.getElementById('mainUploadProgress');
+    const mainProgressBar = document.getElementById('mainProgressBar');
+    const mainFileNameSpan = document.getElementById('mainFileName');
+    const mainFileLink = document.getElementById('mainFileLink');
+    const clearMainBtn = document.getElementById('clearMainFileBtn');
+
+    function resetMainFile() {
+        mainDocFileUrl = null;
+        mainDocFileName = null;
+        mainFileNameSpan.innerText = 'No file';
+        mainFileLink.style.display = 'none';
+        clearMainBtn.style.display = 'none';
+        mainFileLink.href = '#';
+    }
+
+    async function uploadFile(file, typeHint = 'document') {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', typeHint);
+        const response = await fetch(URLS.upload_file, {
+            method: 'POST',
+            headers: { 'X-API-TOKEN': API_TOKEN },
+            body: formData
+        });
+        const data = await response.json();
+        if (!data.status) throw new Error(data.error || 'Upload failed');
+        return { fileUrl: data.fileUrl, fileName: data.fileName || file.name };
+    }
+
+    async function handleMainFileUpload(file) {
+        if (!file.name.endsWith('.docx')) throw new Error('Only .docx files allowed');
+        if (file.size > 20 * 1024 * 1024) throw new Error('Max size 20MB');
+        mainProgressDiv.style.display = 'block';
+        mainProgressBar.style.width = '0%';
+        let fakeInterval = setInterval(() => { 
+            let w = parseInt(mainProgressBar.style.width); 
+            if (w < 85) mainProgressBar.style.width = (w + 15) + '%'; 
+        }, 150);
+        const { fileUrl, fileName } = await uploadFile(file, 'main_doc');
+        clearInterval(fakeInterval);
+        mainProgressBar.style.width = '100%';
+        setTimeout(() => { mainProgressDiv.style.display = 'none'; }, 500);
+        mainDocFileUrl = fileUrl;
+        mainDocFileName = fileName;
+        mainFileNameSpan.innerText = fileName;
+        mainFileLink.href = fileUrl;
+        mainFileLink.style.display = 'inline-block';
+        clearMainBtn.style.display = 'inline-block';
+        showToast('File uploaded successfully: ' + fileName);
+    }
+
+    mainUploadZone.addEventListener('click', () => mainDocInput.click());
+    document.getElementById('triggerMainUploadBtn').addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        mainDocInput.click(); 
+    });
+    mainDocInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            await handleMainFileUpload(file);
+        } catch (err) { 
+            showToast(err.message, 'error');
+        }
+        mainDocInput.value = '';
+    });
+    clearMainBtn.addEventListener('click', resetMainFile);
+
+    // ============================================
+    // BRIEF & OUTLINE UPLOAD HANDLERS
+    // ============================================
+    async function extractTextFromFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch(URLS.extract_from_file, {
+            method: 'POST',
+            headers: { 'X-API-TOKEN': API_TOKEN },
+            body: formData
+        });
+        const data = await response.json();
+        if (!data.status) throw new Error(data.error || 'Extraction failed');
+        return data.text;
+    }
+
+    // Brief upload
+    document.getElementById('triggerBriefUploadBtn').addEventListener('click', () => {
+        document.getElementById('briefFileInput').click();
+    });
+    document.getElementById('briefFileInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await extractTextFromFile(file);
+            document.getElementById('qaBrief').value = text;
+            showToast('Brief extracted successfully');
+        } catch (err) {
+            showToast('Extraction failed: ' + err.message, 'error');
+        }
+        e.target.value = '';
+    });
+
+    // Outline upload
+    document.getElementById('triggerOutlineUploadBtn').addEventListener('click', () => {
+        document.getElementById('outlineFileInput').click();
+    });
+    document.getElementById('outlineFileInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await extractTextFromFile(file);
+            document.getElementById('qaOutline').value = text;
+            showToast('Outline extracted successfully');
+        } catch (err) {
+            showToast('Extraction failed: ' + err.message, 'error');
+        }
+        e.target.value = '';
+    });
+
+    // ============================================
+    // RENDER QA RESULTS
+    // ============================================
+    function renderQaResults(data) {
+        const container = document.getElementById('qaResultsContent');
+        const clientBtn = document.getElementById('sendToClientBtn');
+
+        container.innerHTML = '';
+
+        document.getElementById('OverallScore').innerText = data.finalScore ?? 'N/A';
+        document.getElementById('TotalWordCount').innerText = data.wordCount ?? 'N/A';
+
+        const judgmentElem = document.getElementById('OverallJudgment');
+        if (judgmentElem) {
+            judgmentElem.innerText = data.overallJudgment ?? 'Pending';
+            judgmentElem.style.color = data.overallJudgmentcolor ?? '#1890FF';
+        }
+
+        clientBtn.classList.remove('d-none');
+
+        const allKeys = ['formatting', 'grammar', 'content', 'citation', 'plagiarism', 'aiDetection'];
+        const checkNames = {
+            formatting: '📐 Formatting',
+            grammar: '✍️ Grammar',
+            content: '📄 Content Quality',
+            citation: '📚 Citation & References',
+            plagiarism: '⚠️ Plagiarism Risk',
+            aiDetection: '🤖 AI Detection'
+        };
+
+        function getStatusColor(score) {
+            if (score >= 90) return { color: '#10b981', icon: '✅' };
+            if (score >= 80) return { color: '#34d399', icon: '🟢' };
+            if (score >= 70) return { color: '#3b82f6', icon: '🔵' };
+            if (score >= 60) return { color: '#f59e0b', icon: '🟡' };
+            if (score >= 50) return { color: '#f97316', icon: '🟠' };
+            return { color: '#ef4444', icon: '🔴' };
+        }
+
+        function renderList(title, items, emptyText, className) {
+            if (!items || items.length === 0) {
+                return `
+                    <div class="mt-3">
+                        <div class="fw-bold mb-1">${title}</div>
+                        <div class="text-muted small">${emptyText}</div>
+                    </div>
+                `;
+            }
+            return `
+                <div class="mt-3">
+                    <div class="fw-bold mb-1">${title}</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${items.map(i => `<span class="${className}">${escapeHtml(i)}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        allKeys.forEach(key => {
+            const section = data?.[key] || null;
+            const score = section?.Score ?? 0;
+            let issues = section?.Issues ?? [];
+            let suggestions = section?.Suggestions ?? [];
+            
+            if (typeof issues === 'string') issues = [issues];
+            if (typeof suggestions === 'string') suggestions = [suggestions];
+
+            const status = getStatusColor(score);
+            const isMissing = !section;
+
+            const card = document.createElement('div');
+            card.className = 'col-md-6 col-lg-6';
+            card.innerHTML = `
+                <div class="result-card p-3 h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="fw-bold mb-0">
+                            ${checkNames[key]} ${isMissing ? '⚠️' : status.icon}
+                        </h6>
+                        <span class="badge" style="background-color:${isMissing ? '#999' : status.color};color:white;padding:0.25rem 0.75rem;border-radius:1rem;">
+                            ${isMissing ? 'N/A' : score + '%'}
+                        </span>
+                    </div>
+                    <div class="progress progress-sm mb-2">
+                        <div class="progress-bar" style="width:${isMissing ? 0 : score}%;background-color:${isMissing ? '#ccc' : status.color};"></div>
+                    </div>
+                    ${renderList('Issues', issues, 'No issues found', 'badge-issue')}
+                    ${renderList('Suggestions', suggestions, 'No suggestions available', 'badge-suggestion')}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        document.getElementById('qaResults').style.display = 'block';
+        document.getElementById('qaDownloadSection').style.display = 'block';
+        window.scrollTo({
+            top: document.getElementById('qaResults').offsetTop - 80,
+            behavior: 'smooth'
+        });
+    }
+
+    // ============================================
+    // START QA ANALYSIS - UPDATED WITH CORRECT FIELD NAMES
+    // ============================================
+    document.getElementById('startQaBtn').addEventListener('click', async function() {
+        const btn = this;
+
+        if (!mainDocFileUrl) {
+            showToast('Please upload the main DOCX document to analyze.', 'error');
+            return;
+        }
+
+        // Get checks with correct values (content, citation, plagiarism, aiDetection, grammar, formatting)
+        let checks = Array.from(document.querySelectorAll('#qaContent, #qaCitation, #qaPlagiarism, #qaAI'))
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
+        if (grammarStyleToggle.checked) {
+            checks.push('grammar');
+        }
+
+        if (formatCheckerToggle.checked) {
+            checks.push('formatting');
+        }
+
+        if (!checks.length) {
+            showToast('Select at least one QA module.', 'error');
+            return;
+        }
+
+        const briefText = document.getElementById('qaBrief').value.trim();
+        const outlineText = document.getElementById('qaOutline').value.trim();
+
+        if (!briefText) {
+            showToast('Please provide brief text (either paste or upload a file).', 'error');
+            return;
+        }
+
+        const formatting_rule = getSelectedFormattingRules();
+        if (formatCheckerToggle.checked && !formatting_rule) {
+            showToast('Please select at least one formatting rule.', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse me-2"></i> Processing...';
+
+        document.getElementById('qaLoader').style.display = 'block';
+        document.getElementById('qaResults').style.display = 'none';
+        document.getElementById('qaDownloadSection').style.display = 'none';
+
+        try {
+            const response = await fetch(URLS.run_qa, {
+                method: 'POST',
+                headers: {
+                    'X-API-TOKEN': API_TOKEN,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fileUrl: mainDocFileUrl,
+                    filename: mainDocFileName,
+                    checks: checks,
+                    brief: briefText,
+                    outline: outlineText,
+                    formatting_rule: formatting_rule,
+                    grammar_checks: getGrammarChecks(),
+                })
+            });
+
+            const data = await response.json();
+
+            if (!data.status) {
+                showToast(data.error || 'QA analysis failed.', 'error');
+                return;
+            }
+
+            renderQaResults(data.qa_raw);
+            clientPdfFileUrl = data.clientPdffileUrl;
+
+        } catch (err) {
+            console.error(err);
+            showToast('QA error: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-play me-2"></i> Start QA Analysis';
+            document.getElementById('qaLoader').style.display = 'none';
+        }
+    });
+
+    // ============================================
+    // DOWNLOAD REPORT
+    // ============================================
+    function downloadFile(url, fileName) {
+        if (!fileName) fileName = url.split('/').pop() || 'report.pdf';
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    document.getElementById('sendToClientBtn').addEventListener('click', () => {
+        if (clientPdfFileUrl) downloadFile(clientPdfFileUrl);
+    });
+
+    console.log('✅ QA Checker initialized');
+    console.log('📡 API URL:', API_BASE_URL);
+</script>
+{% endblock %}
