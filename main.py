@@ -1,16 +1,19 @@
 from flask import Flask
-from app.routes import web
 from config import Config
 
-
-
-
+# Create Flask app - using absolute paths for templates and static
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(
     __name__,
-    template_folder="app/templates",
-    static_folder="app/static"
+    template_folder=os.path.join(BASE_DIR, 'app', 'templates'),
+    static_folder=os.path.join(BASE_DIR, 'app', 'static')
 )
+
+# Load config
+app.config.from_object(Config)
+
 # Register custom filters
 @app.template_filter('level_class')
 def level_class_filter(level):
@@ -40,11 +43,15 @@ def priority_class_filter(pri):
         return 'pb-m'
     return 'pb-l'
 
-
-# Load config.py into Flask
-app.config.from_object(Config)
-
-app.register_blueprint(web)
+# Import and register blueprint
+try:
+    from app.routes import web
+    app.register_blueprint(web)
+    print("✅ Blueprint 'web' registered successfully")
+    print(f"📁 Template folder: {app.template_folder}")
+    print(f"📁 Static folder: {app.static_folder}")
+except ImportError as e:
+    print(f"⚠️ Error importing blueprint: {e}")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=app.config["DEBUG"])
+    app.run(host="0.0.0.0", port=5000, debug=app.config.get("DEBUG", False))
